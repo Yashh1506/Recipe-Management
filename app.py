@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, url_for,send_file, redirect, 
 from flask_sqlalchemy import SQLAlchemy
 import base64
 
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///Recipe.db'
 db = SQLAlchemy(app)
@@ -24,10 +25,12 @@ class Recipe(db.Model):
 
 @app.route('/')
 def index():
-    return render_template('home.html')
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
+    return render_template('home.html',cuisine=cuisine)
 
 @app.route('/new_recipe', methods=['GET','POST'])
 def new_recipe():
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
     if request.method=="POST":
         title=request.form['title']
         cuisine=request.form['cuisine']
@@ -44,12 +47,13 @@ def new_recipe():
         db.session.add(recipe)
         db.session.commit()
         return redirect('/all_recipe')
-    return render_template('new_recipe.html')
+    return render_template('new_recipe.html',cuisine=cuisine)
 
 
 
 @app.route('/all_recipe')
 def all_recipe():
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
     all_recipe = Recipe.query.all()
     recipe_with_images=[]
     for recipe in all_recipe:
@@ -60,10 +64,11 @@ def all_recipe():
         else:
             image_src = None
         recipe_with_images.append({'sno':recipe.sno,'image_src':image_src})
-    return render_template('all_recipe.html', all_recipe=all_recipe,recipe_with_images=recipe_with_images )
+    return render_template('all_recipe.html', all_recipe=all_recipe,recipe_with_images=recipe_with_images, cuisine=cuisine)
 
 @app.route('/recipe/<int:sno>')
 def recipe(sno):
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
     recipe = Recipe.query.filter_by(sno=sno).first()
     if recipe.image:
         # Convert binary data to base64
@@ -71,7 +76,7 @@ def recipe(sno):
         image_src = f"data:image/jpg;base64,{image_base64}"  # Replace png with the actual image type if necessary
     else:
         image_src = None
-    return render_template('recipe.html', recipe=recipe,image_src=image_src)
+    return render_template('recipe.html', recipe=recipe,image_src=image_src,cuisine=cuisine)
 
 @app.route('/update/<int:sno>', methods=['GET','POST'])
 def update(sno):
@@ -107,13 +112,27 @@ def update(sno):
 
 @app.route('/delete/<int:sno>')
 def delete(sno):
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
     recipe = Recipe.query.filter_by(sno=sno).first()
     db.session.delete(recipe)
     db.session.commit()
-    return redirect('/all_recipe')
+    return redirect('/all_recipe', cuisine=cuisine)
+
     
-
-
+@app.route('/cuisine/<string:cuisine>')
+def cuisine(cuisine):
+    name=Recipe.query.filter_by(cuisine=cuisine)
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
+    recipe_with_images=[]
+    for recipe in name:
+        if recipe.image:
+        # Convert binary data to base64
+            image_base64 = base64.b64encode(recipe.image).decode('utf-8')
+            image_src = f"data:image/jpg;base64,{image_base64}"  # Replace png with the actual image type if necessary
+        else:
+            image_src = None
+        recipe_with_images.append({'sno':recipe.sno,'image_src':image_src})
+    return render_template('cuisine.html', name=name,recipe_with_images=recipe_with_images,cuisine=cuisine)
 
 if __name__=="__main__":
     app.run(debug=True)
