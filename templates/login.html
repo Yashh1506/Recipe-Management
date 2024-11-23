@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<head>
+    <style>
+        /* body {
+            font-family: Arial, sans-serif;
+            margin: 0 auto;
+            max-width: 600px;
+            padding: 20px;
+        } */
+        h1 {
+            text-align: center;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <form style="background-color: #ffffff; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+          <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <input type="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Login</button>
+        <br>    
+        Don't have an account
+        <button type="submit" class="btn btn-primary">
+            <a class="nav-link active" aria-current="page" href="{{url_for ('signup')}}">Sign up</a>
+        </button>
+        
+
+      </form>
+</body>
+{% endblock %}

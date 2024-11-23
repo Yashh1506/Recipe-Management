@@ -25,12 +25,22 @@ class Recipe(db.Model):
 
 @app.route('/')
 def index():
-    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
     return render_template('home.html',cuisine=cuisine)
+
+@app.route('/login')
+def login():
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
+    return render_template('login.html',cuisine=cuisine)
+
+@app.route('/signup')
+def signup():
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
+    return render_template('signup.html',cuisine=cuisine)
 
 @app.route('/new_recipe', methods=['GET','POST'])
 def new_recipe():
-    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
     if request.method=="POST":
         title=request.form['title']
         cuisine=request.form['cuisine']
@@ -53,7 +63,7 @@ def new_recipe():
 
 @app.route('/all_recipe')
 def all_recipe():
-    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
     all_recipe = Recipe.query.all()
     recipe_with_images=[]
     for recipe in all_recipe:
@@ -68,7 +78,7 @@ def all_recipe():
 
 @app.route('/recipe/<int:sno>')
 def recipe(sno):
-    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
     recipe = Recipe.query.filter_by(sno=sno).first()
     if recipe.image:
         # Convert binary data to base64
@@ -112,7 +122,7 @@ def update(sno):
 
 @app.route('/delete/<int:sno>')
 def delete(sno):
-    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
     recipe = Recipe.query.filter_by(sno=sno).first()
     db.session.delete(recipe)
     db.session.commit()
@@ -122,7 +132,7 @@ def delete(sno):
 @app.route('/cuisine/<string:cuisine>')
 def cuisine(cuisine):
     name=Recipe.query.filter_by(cuisine=cuisine)
-    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).all()
+    cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
     recipe_with_images=[]
     for recipe in name:
         if recipe.image:
