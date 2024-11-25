@@ -23,14 +23,16 @@ class Recipe(db.Model):
     def __repr__(self) -> str:
         return f'{self.sno} - {self.title}'
 
+
 @app.route('/')
 def index():
     cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
     return render_template('home.html',cuisine=cuisine)
 
-@app.route('/login')
+@app.route('/login', methods=['GET','POST'])
 def login():
     cuisine=db.session.query(Recipe.cuisine).order_by(Recipe.cuisine).distinct()
+
     return render_template('login.html',cuisine=cuisine)
 
 @app.route('/signup')
